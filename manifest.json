@@ -1,0 +1,20 @@
+{
+    "manifest_version": 3,
+    "name": "DefineIt",
+    "description": "Flashcard Dictionary",
+    "version": "1.0",
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "background": {
+        "service_worker": "serviceWorker.js",
+        "type": "module"
+    },
+    "permissions": ["contextMenus", "storage", "notifications"],
+    "icons": {
+        "16": "/assets/images/icon.png",
+        "32": "/assets/images/icon.png",
+        "48": "/assets/images/icon.png",
+        "128": "/assets/images/icon.png"
+    }
+}
