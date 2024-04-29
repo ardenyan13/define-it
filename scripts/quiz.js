@@ -64,14 +64,24 @@ export class Quiz {
     }
 
     generateQuestions(words) {
-        let currIndex = 1;
-        for (let word in words) {
-            this.createQuestion(word, words, currIndex);
-            currIndex++;
-        }
+        // get the number of random words needed (3 for each question)
+        let numRandomWords = 3 * Object.keys(words).length;
+
+        // get all random words
+        fetch(`https://random-word-api.herokuapp.com/word?number=${numRandomWords}`)
+        .then(response => response.json())
+        .then(randomWords => {
+            let currIndex = 1;
+            for (let word in words) {
+                // get the next 3 random words
+                let wordsForThisQuestion = randomWords.splice(0, 3);
+                this.createQuestion(word, words, currIndex, wordsForThisQuestion);
+                currIndex++;
+            }
+        })
     }
 
-    createQuestion(word, words, currIndex) {
+    createQuestion(word, words, currIndex, wordsForThisQuestion) {
         let correctWord = word;
         let def = words[word].definitions[words[word].defaultDefIndex];
 
@@ -84,44 +94,36 @@ export class Quiz {
         definitionP.textContent = `${currIndex}.  ${def}`;
         questionDiv.appendChild(definitionP);
 
+        // create the array of choices and randomize them
+        let choices = [word, ...wordsForThisQuestion];
+        choices = this.fisherYatesShuffle(choices);
+
         let answeredQuestions = 0;
 
-        // get 3 other words as wrong choices
-        let choices = [correctWord];
-        fetch("https://random-word-api.herokuapp.com/word?number=3")
-        .then(response => response.json())
-        .then(threeWords => {
-            for (let w of threeWords) {
-                choices.push(w);
-            }
-            // randomize the choices
-            choices = this.fisherYatesShuffle(choices);
+        // create buttons for the answer choices
+        for (let j = 0; j < choices.length; j++) {
+            let choiceButton = document.createElement("button");
+            choiceButton.textContent = choices[j];
+            choiceButton.addEventListener("click", () => {
+                // check if the selected choice is correct
+                if (choices[j] === correctWord) {
+                    this.score++;
+                    alert("correct");
+                }
+                else {
+                    alert("incorrect");
+                    this.incorrectWords.push(correctWord);
+                }
+                // remove the current question
+                this.questionsContainer.removeChild(questionDiv);
+                this.answeredQuestions++;
 
-            // create buttons for the answer choices
-            for (let j = 0; j < choices.length; j++) {
-                let choiceButton = document.createElement("button");
-                choiceButton.textContent = choices[j];
-                choiceButton.addEventListener("click", () => {
-                    // check if the selected choice is correct
-                    if (choices[j] === correctWord) {
-                        this.score++;
-                        alert("correct");
-                    }
-                    else {
-                        alert("incorrect");
-                        this.incorrectWords.push(correctWord);
-                    }
-                    // remove the current question
-                    this.questionsContainer.removeChild(questionDiv);
-                    this.answeredQuestions++;
-
-                    if (this.answeredQuestions === Object.keys(words).length) {
-                        this.showResults();
-                    }
-                });
-                questionDiv.appendChild(choiceButton);
-            }
-        });
+                if (this.answeredQuestions === Object.keys(words).length) {
+                    this.showResults();
+                }
+            });
+            questionDiv.appendChild(choiceButton);
+        }
 
         // add the question to the quiz
         this.questionsContainer.appendChild(questionDiv);
