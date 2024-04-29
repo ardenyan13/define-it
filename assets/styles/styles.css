@@ -71,6 +71,7 @@ button {
     background-color: #FAF9F6;
     padding: 0;
     margin: 0;
+    margin-left: 5px;
     /* outline: none; */
 }
 button:hover {
@@ -81,4 +82,29 @@ button:hover {
 .star {
     padding: 5px;
     border: none;
+}
+
+.question p {
+    font-size: 20px;
+}
+
+.results p{
+    font-size: 20px;
+}
+
+.question button {
+    background-color: #FAF9F6;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 18px;
+}
+
+.quiz-button {
+    background-color: #FAF9F6;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 15px;
+    margin: 3px;
 }
